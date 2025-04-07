@@ -14,9 +14,8 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { Menu } from "antd";
-import { useRouter } from "next/router";
 import React from "react";
-import { createMenuItems, EXTERNAL_URL_PREFIX } from "src/layouts/base/common";
+import { createMenuItems } from "src/layouts/base/common";
 import { antdBreakpoints } from "src/layouts/base/constants";
 import { NavItemProps } from "src/layouts/base/types";
 import { styled } from "styled-components";
@@ -52,25 +51,6 @@ export const BigScreenMenu: React.FC<Props> = ({
   routes, className, activeKeys, pathname,
 }) => {
 
-  const router = useRouter();
-
-  const handleMenuClick = (e: any) => {
-    const clickedRoute = routes?.find((route) => route.path === e.key);
-    if (clickedRoute) {
-      clickedRoute.handleClick?.();
-      const target = clickedRoute.clickToPath ?? clickedRoute.path;
-      if (clickedRoute.openInNewPage) {
-        window.open(target);
-      } else {
-        if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
-          window.location.href = target;
-        } else {
-          void router.push(target);
-        }
-      }
-    }
-  };
-
   return (
     <Container className={className}>
       {
@@ -81,7 +61,6 @@ export const BigScreenMenu: React.FC<Props> = ({
               theme="light"
               mode="horizontal"
               selectedKeys={activeKeys}
-              onClick={handleMenuClick}
               items={createMenuItems(routes, pathname, true)}
             />
           ) : undefined

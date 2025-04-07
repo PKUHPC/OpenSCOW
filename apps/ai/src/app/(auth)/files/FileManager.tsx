@@ -68,7 +68,7 @@ interface PromiseSettledResult {
   value?: FileInfo | undefined;
 }
 
-export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPrefix }) => {
+export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix }) => {
   const t = useI18nTranslateToString();
   const p = prefix("app.files.fileManager.");
   const languageId = useI18n().currentLanguage.id;

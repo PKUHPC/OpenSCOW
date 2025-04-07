@@ -12,7 +12,6 @@
 
 import { arrayContainsElement } from "@scow/utils";
 import { ItemType } from "antd/es/menu/interface";
-import Link from "next/link";
 import Router from "next/router";
 import React from "react";
 import { match } from "src/layouts/base/matchers";
@@ -33,6 +32,20 @@ export function createMenuItems(
 ) {
 
   function createMenuItem(route: NavItemProps): ItemType {
+    const handleClick = () => {
+      const target = route.clickToPath ?? route.path;
+      route.handleClick?.();
+      if (route.openInNewPage) {
+        window.open(target);
+      } else {
+        if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
+          window.location.href = target;
+        } else {
+          void Router.push(target);
+        }
+      }
+    };
+
     if (arrayContainsElement(route.children)) {
       return {
         icon: iconToNode(route.Icon),
@@ -40,19 +53,7 @@ export function createMenuItems(
         title: route.text,
         label: route.text,
         onTitleClick:(route.clickable ?? parentClickable)
-          ? () => {
-            const target = route.clickToPath ?? route.path;
-            route.handleClick?.();
-            if (route.openInNewPage) {
-              window.open(target);
-            } else {
-              if (EXTERNAL_URL_PREFIX.some((pref) => target.startsWith(pref))) {
-                window.location.href = target;
-              } else {
-                void Router.push(target);
-              }
-            }
-          }
+          ? handleClick
           : undefined,
         children: createMenuItems(route.children, pathname, parentClickable),
       } as ItemType;
@@ -60,19 +61,9 @@ export function createMenuItems(
 
     return {
       icon: iconToNode(route.Icon),
-      key: route.path + route.text,
-      label: (
-        <Link
-          href={route.clickToPath ?? route.path}
-          {...route.openInNewPage ? { target: "_blank" } : {}}
-          style={{ textDecoration:"none" }}
-        >
-          {route.text}
-        </Link>
-      ),
-      onClick: () => {
-        route.handleClick?.();
-      },
+      key: route.path,
+      label: route.text,
+      onClick: handleClick,
     } as ItemType;
   }
 

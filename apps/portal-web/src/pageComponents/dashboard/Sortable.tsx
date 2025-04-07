@@ -27,7 +27,6 @@ import {
   SortableContext } from "@dnd-kit/sortable";
 import { Entry } from "@scow/protos/build/portal/dashboard";
 import { message } from "antd";
-import { useRouter } from "next/router";
 import { join } from "path";
 import { FC, useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "src/apis";
@@ -81,7 +80,6 @@ export const Sortable: FC<Props> = ({
 
   const t = useI18nTranslateToString();
   const i18n = useI18n();
-  const router = useRouter();
 
   // 实际的快捷入口项
   const [items, setItems] = useState<Entry []>(quickEntryArray);

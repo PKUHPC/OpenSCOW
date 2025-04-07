@@ -9,7 +9,6 @@ import { blockAccount, unblockAccount } from "src/bl/block";
 import { getActivatedClusters } from "src/bl/clustersUtils";
 import { authUrl } from "src/config";
 import { configClusters } from "src/config/clusters";
-import { config } from "src/config/env";
 import { Account } from "src/entities/Account";
 import { Tenant } from "src/entities/Tenant";
 import { TenantRole, User, UserState } from "src/entities/User";

@@ -38,7 +38,6 @@ export const getAllMessageTypesData = async (em: SqlEntityManager): Promise<Cust
 };
 
 export const checkMessageTypeExist =
-  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   async (em: SqlEntityManager, type: string): Promise<CustomMessageType | null> => {
     if (internalMessageTypesMap.has(type as InternalMessageType)) {
       return { type, ...internalMessageTypesMap.get(type as InternalMessageType) } as CustomMessageType;

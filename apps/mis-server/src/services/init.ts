@@ -6,7 +6,6 @@ import { createUser } from "@scow/lib-auth";
 import { InitServiceServer, InitServiceService } from "@scow/protos/build/server/init";
 import { authUrl } from "src/config";
 import { configClusters } from "src/config/clusters";
-import { config } from "src/config/env";
 import { SystemState } from "src/entities/SystemState";
 import { PlatformRole, TenantRole, User, UserState } from "src/entities/User";
 import { DEFAULT_TENANT_NAME } from "src/utils/constants";
@@ -69,7 +68,7 @@ export const initServiceServer = plugin((server) => {
 
           await insertKeyToNewUser(userId, password, server.logger, filterClusterConfig)
             .catch(() => {});
-          
+
           return true;
         })
         // If the call of creating user of auth fails,  delete the user created in the database.
