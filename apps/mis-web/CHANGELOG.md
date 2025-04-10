@@ -1,5 +1,12 @@
 # @scow/mis-web
 
+## 1.8.3
+
+### Patch Changes
+
+- Updated dependencies [d029383]
+  - @scow/lib-web@1.4.12
+
 ## 1.8.2
 
 ### Patch Changes

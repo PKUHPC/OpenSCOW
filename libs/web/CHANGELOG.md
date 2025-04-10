@@ -1,5 +1,11 @@
 # @scow/lib-web
 
+## 1.4.12
+
+### Patch Changes
+
+- d029383: 修复导航栏点击图标和空白区无法跳转
+
 ## 1.4.11
 
 ### Patch Changes

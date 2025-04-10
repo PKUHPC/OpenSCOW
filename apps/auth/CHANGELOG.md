@@ -1,5 +1,7 @@
 # @scow/auth
 
+## 1.8.3
+
 ## 1.8.2
 
 ### Patch Changes

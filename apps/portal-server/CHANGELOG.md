@@ -1,5 +1,11 @@
 # @scow/portal-server
 
+## 1.8.3
+
+### Patch Changes
+
+- 76677e9: 修复 shell 只进入第一个登录节点的问题
+
 ## 1.8.2
 
 ### Patch Changes

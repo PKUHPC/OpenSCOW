@@ -1,5 +1,12 @@
 # @scow/resource
 
+## 0.2.9
+
+### Patch Changes
+
+- Updated dependencies [d029383]
+  - @scow/lib-web@1.4.12
+
 ## 0.2.8
 
 ### Patch Changes

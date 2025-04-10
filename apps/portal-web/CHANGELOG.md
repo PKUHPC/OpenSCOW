@@ -1,5 +1,13 @@
 # @scow/portal-web
 
+## 1.8.3
+
+### Patch Changes
+
+- d029383: 修复导航栏点击图标和空白区无法跳转
+- Updated dependencies [d029383]
+  - @scow/lib-web@1.4.12
+
 ## 1.8.2
 
 ### Patch Changes

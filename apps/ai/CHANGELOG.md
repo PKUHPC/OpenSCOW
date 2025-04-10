@@ -1,5 +1,14 @@
 # @scow/ai
 
+## 0.3.3
+
+### Patch Changes
+
+- cd936f7: 新建镜像选择远程镜像时增加集群参数
+- 50acbfc: AI 添加远程镜像时支持输入用户名密码
+- Updated dependencies [d029383]
+  - @scow/lib-web@1.4.12
+
 ## 0.3.2
 
 ### Patch Changes

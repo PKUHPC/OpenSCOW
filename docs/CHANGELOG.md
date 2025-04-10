@@ -1,5 +1,11 @@
 # @scow/docs
 
+## 1.4.9
+
+### Patch Changes
+
+- c161586: ai 接入多个集群时配置文件目录说明
+
 ## 1.4.8
 
 ### Patch Changes
