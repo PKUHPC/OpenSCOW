@@ -1,11 +1,22 @@
-import { ScowdClient } from "@scow/lib-scowd/build/client";
+import { ServiceError, status } from "@grpc/grpc-js";
+import { getScowdClient } from "@scow/lib-scowd/build/client";
 import { ShellOps } from "src/clusterops/api/shell";
-import { mapTRPCExceptionToGRPC } from "src/utils/scowd";
+import { scowdClientNotFound } from "src/utils/errors";
+import { certificates, getLoginNodeScowdUrl, mapTRPCExceptionToGRPC } from "src/utils/scowd";
 
-export const scowdShellServices = (client: ScowdClient): ShellOps => ({
+export const scowdShellServices = (): ShellOps => ({
   shell: async (request, logger) => {
 
     const { call, cluster, loginNode, userId, rows, cols } = request;
+
+    const scowdUrl = getLoginNodeScowdUrl(cluster, loginNode);
+
+    if (!scowdUrl) {
+      throw { code: status.INTERNAL, details: `Cluster ${cluster} not have login node ${loginNode}` } as ServiceError;
+    }
+
+    const client = getScowdClient(scowdUrl, certificates);
+    if (!client) { throw scowdClientNotFound(scowdUrl); }
 
     try {
       const scowdStream = client.shell.shell((async function* () {

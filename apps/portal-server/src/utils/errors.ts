@@ -14,7 +14,10 @@ import { ServiceError } from "@grpc/grpc-js";
 import { Status } from "@grpc/grpc-js/build/src/constants";
 
 export const scowdClientNotFound = (cluster: string) => {
-  return { code: Status.NOT_FOUND, message: `The scowd client on cluster ${cluster} was not found` } as ServiceError;
+  return {
+    code: Status.NOT_FOUND,
+    message: `The scowd client on cluster ${cluster} was not found`,
+  } as ServiceError;
 };
 
 export const clusterNotFound = (cluster: string) => {
