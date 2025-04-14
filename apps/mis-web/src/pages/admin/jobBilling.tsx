@@ -1,17 +1,5 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { queryToString, useQuerystring } from "@scow/lib-web/build/utils/querystring";
-import { Button, Form, Space } from "antd";
+import { Button, Form, message, Space } from "antd";
 import { NextPage } from "next";
 import Router from "next/router";
 import React, { useCallback } from "react";
@@ -53,10 +41,17 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
   const t = useI18nTranslateToString();
 
   const { clusterSortedIdList, activatedClusters } = useStore(ClusterInfoStore);
+
   const currentActivatedClusterIds = Object.keys(activatedClusters);
   const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
     return await api.getBillingItems({
-      query: { tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList } });
+      query: { tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList },
+    }).httpError(409, () => {
+      message.error(t("common.failedGetTenantAssignedClustersAndPartitions"));
+      return undefined;
+    }).then((result) => {
+      return result;
+    });
   }, [tenant]) });
 
   return (
@@ -85,6 +80,7 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
         loading={isLoading}
         tenant={tenant}
         reload={reload}
+        isFromPlatformAdmin={true}
       />
     </div>
   );

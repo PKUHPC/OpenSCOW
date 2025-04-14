@@ -1,15 +1,3 @@
-/**
- * Copyright (c) 2022 Peking University and Peking University Institute for Computing and Digital Economy
- * SCOW is licensed under Mulan PSL v2.
- * You can use this software according to the terms and conditions of the Mulan PSL v2.
- * You may obtain a copy of Mulan PSL v2 at:
- *          http://license.coscl.org.cn/MulanPSL2
- * THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, WITHOUT WARRANTIES OF ANY KIND,
- * EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO NON-INFRINGEMENT,
- * MERCHANTABILITY OR FIT FOR A PARTICULAR PURPOSE.
- * See the Mulan PSL v2 for more details.
- */
-
 import { MinusCircleOutlined, PlusCircleOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import { numberToMoney } from "@scow/lib-decimal";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
@@ -38,6 +26,7 @@ interface Props {
   loading?: boolean;
   tenant?: string;
   reload: () => void;
+  isFromPlatformAdmin?: boolean;
 }
 
 export interface BillingItemType {
@@ -66,7 +55,8 @@ publicConfig.CUSTOM_AMOUNT_STRATEGIES?.forEach((i) => {
 const p = prefix("pageComp.job.manageJobBillingTable.");
 const pCommon = prefix("common.");
 
-export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, reload }) => {
+export const ManageJobBillingTable: React.FC<Props> = ({ 
+  data, loading, tenant, reload, isFromPlatformAdmin }) => {
 
   const t = useI18nTranslateToString();
 
@@ -77,7 +67,9 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
 
   return (
     <Table
-      dataSource={data?.activeItems}
+      // 如果是平台管理员在平台管理下查看作业价格的租户设置，可以看见该租户的未授权分区但是不可设置价格
+      // 如果是租户管理员在租户管理下查看作业价格的租户设置，则不可见未授权分区
+      dataSource={isFromPlatformAdmin ? data?.activeItems : data?.activeItems?.filter((x) => x.settable)}
       bordered
       loading={loading}
       rowKey={(record) => [record.cluster, record.partition, record.qos].join(".")}
@@ -192,9 +184,22 @@ export const ManageJobBillingTable: React.FC<Props> = ({ data, loading, tenant, 
                       {t(pCommon("set"))}
                     </EditPriceModalLink>
                   ) : (
-                    <Tooltip title={t(p("canNotSetUnAssignedPartition"))}>
-                      <Button disabled>{t(pCommon("set"))}</Button>
-                    </Tooltip>
+                    isFromPlatformAdmin ? (
+                      <Tooltip title={t(p("canNotSetUnAssignedPartition"))}>
+                        <Button 
+                          type="link"
+                          disabled
+                          style={{ 
+                            textAlign: "left", 
+                            display: "flex", 
+                            padding: "0",
+                            height: "auto",
+                          }}
+                        >
+                          {t(pCommon("set"))}
+                        </Button>
+                      </Tooltip>
+                    ) : undefined
                   )
                 }               
               </Space>

@@ -10,6 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
+import { message } from "antd";
 import { NextPage } from "next";
 import { useCallback } from "react";
 import { useAsync } from "react-async";
@@ -38,7 +39,8 @@ export const TenantAdminJobBillingTablePage: NextPage = requireAuth(
 
     const { data, isLoading, reload } = useAsync({ promiseFn: useCallback(async () => {
       return await api.getBillingItems({
-        query: { tenant: tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList } });
+        query: { tenant: tenant, activeOnly: false, currentActivatedClusterIds, clusterSortedIdList } })
+        .httpError(409, () => { message.error(t("common.failedGetTenantAssignedClustersAndPartitions")); });
     }, [userStore.user]) });
 
     return (

@@ -118,6 +118,7 @@ export default {
     phone: "Phone",
     organization: "Organization",
     adjustBill: "Adjust Tenant Billing",
+    failedGetTenantAssignedClustersAndPartitions: "Failed to retrieve authorized cluster partition information",
   },
   dashboard: {
     title: "Dashboard",

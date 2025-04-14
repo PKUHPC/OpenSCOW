@@ -80,6 +80,10 @@ export const GetBillingItemsSchema = typeboxRouteSchema({
        */
       nextId: Type.String(),
     }),
+    409: Type.Object({
+      code: Type.Literal("RESOURCE_CONNECT_FAILED"),
+      message: Type.String(),
+    }),
   },
 });
 
@@ -155,9 +159,9 @@ export default /* #__PURE__*/typeboxRoute(GetBillingItemsSchema, async (req, res
       });
       tenantAssignedClustersAndPartitions = response;
     } catch (e) {
-      // 保证在出错时 tenantAssignedClustersAndPartitions 仍为 undefined
-      tenantAssignedClustersAndPartitions = undefined; 
       mapTRPCExceptionToGRPC(e);
+      return { 409: { code: "RESOURCE_CONNECT_FAILED" as const, 
+        message: `Get tenant ${tenant} assinged Clusters and Partitions failed.` } };
     }
   }
 
