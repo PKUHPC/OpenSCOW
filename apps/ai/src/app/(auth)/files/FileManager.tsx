@@ -11,9 +11,8 @@
  */
 
 import { CopyOutlined, DatabaseOutlined, DeleteOutlined, EyeInvisibleOutlined, EyeOutlined,
-  FileAddOutlined, FolderAddOutlined, HomeOutlined, LeftOutlined, MacCommandOutlined,
-  RightOutlined, ScissorOutlined, SnippetsOutlined, UploadOutlined,
-  UpOutlined } from "@ant-design/icons";
+  FileAddOutlined, FolderAddOutlined, HomeOutlined, MacCommandOutlined,
+  ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined } from "@ant-design/icons";
 import { getI18nConfigCurrentText } from "@scow/lib-web/build/utils/systemLanguage";
 import type { inferRouterOutputs } from "@trpc/server";
 import { App, Button, Divider, Modal, Space } from "antd";
@@ -111,14 +110,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
 
   const toHome = () => {
     router.push(fullUrl("~"));
-  };
-
-  const back = () => {
-    router.back();
-  };
-
-  const forward = () => {
-    history.forward();
   };
 
   useEffect(() => {
@@ -273,8 +264,6 @@ export const FileManager: React.FC<Props> = ({ cluster, loginNodes, path, urlPre
         </span>
       </TitleText>
       <TopBar>
-        <Button onClick={back} icon={<LeftOutlined />} shape="circle" />
-        <Button onClick={forward} icon={<RightOutlined />} shape="circle" />
         <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar

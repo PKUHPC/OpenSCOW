@@ -11,11 +11,8 @@
  */
 
 import {
-  CopyOutlined,
-  DatabaseOutlined,
-  DeleteOutlined, EyeInvisibleOutlined,
-  EyeOutlined, FileAddOutlined, FolderAddOutlined,
-  HomeOutlined, LeftOutlined, MacCommandOutlined, RightOutlined,
+  CopyOutlined, DatabaseOutlined, DeleteOutlined, EyeInvisibleOutlined,
+  EyeOutlined, FileAddOutlined, FolderAddOutlined, HomeOutlined, MacCommandOutlined,
   ScissorOutlined, SnippetsOutlined, UploadOutlined, UpOutlined,
 } from "@ant-design/icons";
 import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
@@ -159,15 +156,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
   const toHome = () => {
     router.push(fullUrl("~"));
   };
-
-  const back = () => {
-    router.back();
-  };
-
-  const forward = () => {
-    history.forward();
-  };
-
 
   useEffect(() => {
     if (path === "~") {
@@ -374,8 +362,6 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
         </span>
       </TitleText>
       <TopBar>
-        <Button onClick={back} icon={<LeftOutlined />} shape="circle" />
-        <Button onClick={forward} icon={<RightOutlined />} shape="circle" />
         <Button onClick={toHome} icon={<HomeOutlined />} shape="circle" />
         <Button onClick={up} icon={<UpOutlined />} shape="circle" />
         <PathBar
