@@ -1,5 +1,11 @@
 # @scow/portal-web
 
+## 1.6.5
+
+### Patch Changes
+
+- 6247e4f: 删除了文件管理下的前进和后退按钮
+
 ## 1.6.4
 
 ### Patch Changes
