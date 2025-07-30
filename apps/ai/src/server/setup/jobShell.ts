@@ -12,6 +12,7 @@
 
 import { asyncClientCall } from "@ddadaal/tsgrpc-client";
 import * as k8sClient from "@kubernetes/client-node";
+import { JobInfo_PodStatus } from "@scow/ai-scheduler-adapter-protos/build/protos/job";
 import { normalizePathnameWithQuery } from "@scow/utils";
 import { IncomingMessage } from "http";
 import { NextApiRequest } from "next";
@@ -189,8 +190,16 @@ wss.on("connection", async (ws: AliveCheckedWebSocket, req) => {
     return;
   }
 
-  const namespace = job.containerJobInfo?.namespace;
-  const podName = job.containerJobInfo?.podName;
+  // 获取运行中pod的namespace，podName
+  const runningPod = job.pods.find((pod) => pod.podStatus === JobInfo_PodStatus.RUNNING);
+
+  if (!runningPod) {
+    log("[shell] No running pod found for this job.");
+    ws.close(1008, "No running pod found for this job.");
+    return;
+  }
+
+  const { namespace, podName } = runningPod;
 
   if (!namespace || !podName) {
     log("[shell] Namespace or pod not obtained, please check the adapter version");

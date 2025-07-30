@@ -256,6 +256,7 @@ procedure
             // 如果nodeCount不为1但同时选定镜像又没有框架标签，该接口会报错
             (nodeCount === 1 && !gpuType?.startsWith("huawei.com")) ? "" : framework || "",
           ],
+          envVariables:[],
           psNodeCount:psNodes,
           workerNodeCount:workerNodes,
         }).catch((e) => {
