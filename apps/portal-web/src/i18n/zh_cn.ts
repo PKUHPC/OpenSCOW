@@ -268,6 +268,8 @@ export default {
           existModalOk: "确认",
           errorMessage: "{}错误！总计{}项文件/目录，其中成功{}项，放弃{}项，失败{}项",
           successMessage: "{}成功！总计{}项文件/目录，其中成功{}项，放弃{}项",
+          invalidCopyTitle: "无效的复制操作",
+          invalidCopyContent: "不能将文件夹复制到自身或子文件夹: {}",
         },
         delete: {
           confirmTitle: "确认删除",
