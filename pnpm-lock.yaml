@@ -1241,8 +1241,8 @@ importers:
         specifier: 3.4.0
         version: 3.4.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       '@node-rs/jieba':
-        specifier: 1.10.3
-        version: 1.10.3
+        specifier: 2.0.1
+        version: 2.0.1
       '@scow/config':
         specifier: workspace:*
         version: link:../libs/config
@@ -2927,8 +2927,17 @@ packages:
   '@emnapi/core@1.1.1':
     resolution: {integrity: sha512-eu4KjHfXg3I+UUR7vSuwZXpRo4c8h4Rtb5Lu2F7Z4JqJFl/eidquONEBiRs6viXKpWBC3BaJBy68xGJ2j56idw==}
 
+  '@emnapi/core@1.4.5':
+    resolution: {integrity: sha512-XsLw1dEOpkSX/WucdqUhPWP7hDxSvZiY+fsUC14h+FtQ2Ifni4znbBt8punRX+Uj2JG/uDb8nEHVKvrVlvdZ5Q==}
+
   '@emnapi/runtime@1.1.1':
     resolution: {integrity: sha512-3bfqkzuR1KLx57nZfjr2NLnFOobvyS0aTszaEGCGqmYMVDRaGvgIZbjGSV/MHSSmLgQ/b9JFHQ5xm5WRZYd+XQ==}
+
+  '@emnapi/runtime@1.4.5':
+    resolution: {integrity: sha512-++LApOtY0pEEz1zrd9vy1/zXVaVJJ/EbAF3u0fXIzPJEDtnITsBGbbK0EkM72amhl/R5b+5xx0Y/QhcVOpuulg==}
+
+  '@emnapi/wasi-threads@1.0.4':
+    resolution: {integrity: sha512-PJR+bOmMOPH8AtcTGAyYNiuJ3/Fcoj2XN/gBEWzDIKh254XO+mM9XoXHk5GNEhodxeMznbg7BlRojVbKN+gC6g==}
 
   '@emotion/hash@0.8.0':
     resolution: {integrity: sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow==}
@@ -3242,6 +3251,9 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
+  '@napi-rs/wasm-runtime@0.2.12':
+    resolution: {integrity: sha512-ZVWUcfwY4E/yPitQJl481FjFo3K22D6qF0DuFH6Y/nbnE11GY5uguDxZMGXPQ8WQ0128MXQD7TnfHyK4oWoIJQ==}
+
   '@napi-rs/wasm-runtime@0.2.4':
     resolution: {integrity: sha512-9zESzOO5aDByvhIAsOy9TbpZ0Ur2AJbUI7UT73kcUTS2mxAMHOBaa1st/jAymNoCtvrit99kkzT1FZuXVcgfIQ==}
 
@@ -3311,8 +3323,20 @@ packages:
     cpu: [arm]
     os: [android]
 
+  '@node-rs/jieba-android-arm-eabi@2.0.1':
+    resolution: {integrity: sha512-tavsIaxybnlA9tRbJ+oc3NW3zhx0d5rNiCGdpIdGWjflwS7HyeUTVAZmAFDlg58Mc6EjTdVKZH+RolBbAJtgcQ==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [android]
+
   '@node-rs/jieba-android-arm64@1.10.3':
     resolution: {integrity: sha512-iuZZZq5yD9lT+AgaXpFe19gtAsIecUODRLLaBFbavjgjLk5cumv38ytWjS36s/eqptwI15MQfysSYOlWtMEG5g==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [android]
+
+  '@node-rs/jieba-android-arm64@2.0.1':
+    resolution: {integrity: sha512-AwdyqKvVNuSDnDq3anUfq+nJ5J/kzXjkfbr/1WY6TfaAlTNuuGVskuQv72/wIx/jn7NoXfm/UPuJrWYG16NC6w==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [android]
@@ -3323,8 +3347,20 @@ packages:
     cpu: [arm64]
     os: [darwin]
 
+  '@node-rs/jieba-darwin-arm64@2.0.1':
+    resolution: {integrity: sha512-10+nwGQ6KzXXJlIL/sELA6Fi6m7eJ7xJksBiKuw1kxKUgaJwtVfAG0iqRF+NRQv0Sdq7r3k5ew9K9y0+IYaEcA==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [darwin]
+
   '@node-rs/jieba-darwin-x64@1.10.3':
     resolution: {integrity: sha512-kjxvV6G1baQo/2I3mELv5qGv4Q0rhd5srwXhypSxMWZFtSpNwCDsLcIOR5bvMBci6QVFfZOs6WD6DKiWVz0SlA==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@node-rs/jieba-darwin-x64@2.0.1':
+    resolution: {integrity: sha512-IJ5RK0X/uPQa1XRmTvwKSieya+w1IJeiKLw0EekoBFJKybXQdvo8/uqM/8z2eVJ8vQxW9X6K2vkVGFvYQa9dYA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [darwin]
@@ -3335,8 +3371,20 @@ packages:
     cpu: [x64]
     os: [freebsd]
 
+  '@node-rs/jieba-freebsd-x64@2.0.1':
+    resolution: {integrity: sha512-yg7vyhqzP2weJu5DJ3q9q4pb0b4GWWRwcv54zK7MSSA6KNJ/uQv2a4R9/qmptLU/fZv14gWuJBEMFdL7y1Dv2w==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [freebsd]
+
   '@node-rs/jieba-linux-arm-gnueabihf@1.10.3':
     resolution: {integrity: sha512-UFB43kDOvqmbRl99e3GPwaTuwJZaAvgLaMTvBkmxww4MpQH6G1k31RLzMW/S21uSQso2lj6W/Mm59gaJk2FiyA==}
+    engines: {node: '>= 10'}
+    cpu: [arm]
+    os: [linux]
+
+  '@node-rs/jieba-linux-arm-gnueabihf@2.0.1':
+    resolution: {integrity: sha512-fxQYunS7w2tv8XV9GigkWJPzHnbcw6tjrUdDu5/qU0FdQVEzGuEYG85DjlNf8lZTDGSUKHBVyAQs7bBIvq8yqg==}
     engines: {node: '>= 10'}
     cpu: [arm]
     os: [linux]
@@ -3347,8 +3395,20 @@ packages:
     cpu: [arm64]
     os: [linux]
 
+  '@node-rs/jieba-linux-arm64-gnu@2.0.1':
+    resolution: {integrity: sha512-VnLU630hQIyO/fwyxh2vqZi72mO+hXkVUC3jVLPfOAlppinmsGX9N81tpTPUK3840hbV8WLtbYTWN1XodI38eg==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
   '@node-rs/jieba-linux-arm64-musl@1.10.3':
     resolution: {integrity: sha512-pJh+SzrK1HaKakhdFM+ew9vXwpZqMxy9u0U7J4GT+3GvOwnAZ+KjeaHebIfgOz7ZHvp/T4YBNf8oWW4zwj3AJw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@node-rs/jieba-linux-arm64-musl@2.0.1':
+    resolution: {integrity: sha512-K4EDyNixSLVdTNYnHwD+7I/ytvzpo7tt+vdCLqwQViiek2PMpL/FFRvA39uU2tk99jXIxvkczdxARG20BRZppg==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [linux]
@@ -3359,8 +3419,20 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@node-rs/jieba-linux-x64-gnu@2.0.1':
+    resolution: {integrity: sha512-sq3J6L2ANTE25I9eVFq/nb57OtXcvUIeUD1CTKJxwgTKIVmcB2LyOZpWf20AjHRUfbMER9Klqg5dgyyO+Six+w==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
   '@node-rs/jieba-linux-x64-musl@1.10.3':
     resolution: {integrity: sha512-h45HMVU/hgzQ0saXNsK9fKlGdah1i1cXZULpB5vQRlRL2ZIaGp+ULtWTogS7vkoo2K8s2l4tqakWMg9eUjIJ2A==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [linux]
+
+  '@node-rs/jieba-linux-x64-musl@2.0.1':
+    resolution: {integrity: sha512-0zfP9Qy68yEXrhBFknfhF6WUJDPU/8eRuyIrkMGdMjfRpxhpSbr2fMfnsqhOQLvhuK4w3iDFvTy4t5d0s6JKMA==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [linux]
@@ -3370,8 +3442,19 @@ packages:
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
 
+  '@node-rs/jieba-wasm32-wasi@2.0.1':
+    resolution: {integrity: sha512-7I5rJya5rlQNJIhv8PvPzIVT1/gVc0vFzHmlfRGwCPGDJ3tHVxkSPW34dDx3OgDmbIeadNpmgIyC1RaS9djPJg==}
+    engines: {node: '>=14.0.0'}
+    cpu: [wasm32]
+
   '@node-rs/jieba-win32-arm64-msvc@1.10.3':
     resolution: {integrity: sha512-B8t4dh56TZnMLBoYWDkopf1ed37Ru/iU1qiIeBkbZWXGmNBChNZUOd//eaPOFjx8m9Sfc8bkj3FBRWt/kTAhmw==}
+    engines: {node: '>= 10'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@node-rs/jieba-win32-arm64-msvc@2.0.1':
+    resolution: {integrity: sha512-Aj/2EwYSaPgAbKnSl+vKM/2kOaZNMZWnShiZzbSNyzlLy3eIOyOYVLbYRDno4547KngRxer8uzROhIQIwXwkvw==}
     engines: {node: '>= 10'}
     cpu: [arm64]
     os: [win32]
@@ -3382,14 +3465,30 @@ packages:
     cpu: [ia32]
     os: [win32]
 
+  '@node-rs/jieba-win32-ia32-msvc@2.0.1':
+    resolution: {integrity: sha512-tpJt3uuBlGrcOInQLTYvcgamQgfadl5cwExLYU+CX9rXKpXLDO31dIujUDBgNWoiQq3tOiU1/AKbT7ZdNd4lBQ==}
+    engines: {node: '>= 10'}
+    cpu: [ia32]
+    os: [win32]
+
   '@node-rs/jieba-win32-x64-msvc@1.10.3':
     resolution: {integrity: sha512-j9I4+a/tf2hsLu8Sr0NhcLBVNBBQctO2mzcjemMpRa1SlEeODyic9RIyP8Ljz3YTN6MYqKh1KA9iR1xvxjxYFg==}
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
 
+  '@node-rs/jieba-win32-x64-msvc@2.0.1':
+    resolution: {integrity: sha512-LDOyo2/2CO8UnpSGLJdgqtH8mOnsABPhNxkfIky7UT9cyLEzOaU44nbA5YzPGpBI3qzMbWcwJYQsjBcgK2VqAg==}
+    engines: {node: '>= 10'}
+    cpu: [x64]
+    os: [win32]
+
   '@node-rs/jieba@1.10.3':
     resolution: {integrity: sha512-SG0CWHmhIveH6upJURgymDKLertEPYbOc5NSFIpbZWW1W2MpqgumVteQO+5YBlkmpR6jMNDPWNQyQwkB6HoeNg==}
+    engines: {node: '>= 10'}
+
+  '@node-rs/jieba@2.0.1':
+    resolution: {integrity: sha512-tnfzXOMqzVQF2dSKMhPC9HrHzzWmN6KheL/zYtGenhOpq/bCKHJWVASSggEnHlkmHgXGeIJHR2N/IuPzewz1BQ==}
     engines: {node: '>= 10'}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -4098,6 +4197,9 @@ packages:
 
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
+
+  '@tybys/wasm-util@0.10.0':
+    resolution: {integrity: sha512-VyyPYFlOMNylG45GoAe0xDoLwWuowvf92F9kySqzYh8vmYm7D2u4iUJKa1tOUpS70Ku13ASrOkS4ScXFsTaCNQ==}
 
   '@tybys/wasm-util@0.9.0':
     resolution: {integrity: sha512-6+7nlbMVX/PVDCwaIQ8nTOPveOcFLSt8GcXdx8hD0bt39uWxYT88uXzqTd4fTvqta7oeUJqudepapKNt2DYJFw==}
@@ -8028,12 +8130,14 @@ packages:
 
   lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    deprecated: This package is deprecated. Use the optional chaining (?.) operator instead.
 
   lodash.isarguments@3.1.0:
     resolution: {integrity: sha512-chi4NHZlZqZD18a0imDHnZPrDeBbTtVN7GXMwuGdRH9qotxAjYs3aVLKc7zNOG9eddR5Ksd8rvFEBc9SsggPpg==}
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
@@ -8645,6 +8749,7 @@ packages:
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
     engines: {node: '>=10.5.0'}
+    deprecated: Use your platform's native DOMException instead
 
   node-emoji@2.1.3:
     resolution: {integrity: sha512-E2WEOVsgs7O16zsURJ/eH8BqhF029wGpEOnv7Urwdo2wmQanOACwJQh0devF9D9RhoZru0+9JXIS0dBXIAz+lA==}
@@ -14487,7 +14592,23 @@ snapshots:
       tslib: 2.6.3
     optional: true
 
+  '@emnapi/core@1.4.5':
+    dependencies:
+      '@emnapi/wasi-threads': 1.0.4
+      tslib: 2.6.3
+    optional: true
+
   '@emnapi/runtime@1.1.1':
+    dependencies:
+      tslib: 2.6.3
+    optional: true
+
+  '@emnapi/runtime@1.4.5':
+    dependencies:
+      tslib: 2.6.3
+    optional: true
+
+  '@emnapi/wasi-threads@1.0.4':
     dependencies:
       tslib: 2.6.3
     optional: true
@@ -15034,6 +15155,13 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  '@napi-rs/wasm-runtime@0.2.12':
+    dependencies:
+      '@emnapi/core': 1.4.5
+      '@emnapi/runtime': 1.4.5
+      '@tybys/wasm-util': 0.10.0
+    optional: true
+
   '@napi-rs/wasm-runtime@0.2.4':
     dependencies:
       '@emnapi/core': 1.1.1
@@ -15080,31 +15208,61 @@ snapshots:
   '@node-rs/jieba-android-arm-eabi@1.10.3':
     optional: true
 
+  '@node-rs/jieba-android-arm-eabi@2.0.1':
+    optional: true
+
   '@node-rs/jieba-android-arm64@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-android-arm64@2.0.1':
     optional: true
 
   '@node-rs/jieba-darwin-arm64@1.10.3':
     optional: true
 
+  '@node-rs/jieba-darwin-arm64@2.0.1':
+    optional: true
+
   '@node-rs/jieba-darwin-x64@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-darwin-x64@2.0.1':
     optional: true
 
   '@node-rs/jieba-freebsd-x64@1.10.3':
     optional: true
 
+  '@node-rs/jieba-freebsd-x64@2.0.1':
+    optional: true
+
   '@node-rs/jieba-linux-arm-gnueabihf@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-linux-arm-gnueabihf@2.0.1':
     optional: true
 
   '@node-rs/jieba-linux-arm64-gnu@1.10.3':
     optional: true
 
+  '@node-rs/jieba-linux-arm64-gnu@2.0.1':
+    optional: true
+
   '@node-rs/jieba-linux-arm64-musl@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-linux-arm64-musl@2.0.1':
     optional: true
 
   '@node-rs/jieba-linux-x64-gnu@1.10.3':
     optional: true
 
+  '@node-rs/jieba-linux-x64-gnu@2.0.1':
+    optional: true
+
   '@node-rs/jieba-linux-x64-musl@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-linux-x64-musl@2.0.1':
     optional: true
 
   '@node-rs/jieba-wasm32-wasi@1.10.3':
@@ -15112,13 +15270,27 @@ snapshots:
       '@napi-rs/wasm-runtime': 0.2.4
     optional: true
 
+  '@node-rs/jieba-wasm32-wasi@2.0.1':
+    dependencies:
+      '@napi-rs/wasm-runtime': 0.2.12
+    optional: true
+
   '@node-rs/jieba-win32-arm64-msvc@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-win32-arm64-msvc@2.0.1':
     optional: true
 
   '@node-rs/jieba-win32-ia32-msvc@1.10.3':
     optional: true
 
+  '@node-rs/jieba-win32-ia32-msvc@2.0.1':
+    optional: true
+
   '@node-rs/jieba-win32-x64-msvc@1.10.3':
+    optional: true
+
+  '@node-rs/jieba-win32-x64-msvc@2.0.1':
     optional: true
 
   '@node-rs/jieba@1.10.3':
@@ -15137,6 +15309,23 @@ snapshots:
       '@node-rs/jieba-win32-arm64-msvc': 1.10.3
       '@node-rs/jieba-win32-ia32-msvc': 1.10.3
       '@node-rs/jieba-win32-x64-msvc': 1.10.3
+
+  '@node-rs/jieba@2.0.1':
+    optionalDependencies:
+      '@node-rs/jieba-android-arm-eabi': 2.0.1
+      '@node-rs/jieba-android-arm64': 2.0.1
+      '@node-rs/jieba-darwin-arm64': 2.0.1
+      '@node-rs/jieba-darwin-x64': 2.0.1
+      '@node-rs/jieba-freebsd-x64': 2.0.1
+      '@node-rs/jieba-linux-arm-gnueabihf': 2.0.1
+      '@node-rs/jieba-linux-arm64-gnu': 2.0.1
+      '@node-rs/jieba-linux-arm64-musl': 2.0.1
+      '@node-rs/jieba-linux-x64-gnu': 2.0.1
+      '@node-rs/jieba-linux-x64-musl': 2.0.1
+      '@node-rs/jieba-wasm32-wasi': 2.0.1
+      '@node-rs/jieba-win32-arm64-msvc': 2.0.1
+      '@node-rs/jieba-win32-ia32-msvc': 2.0.1
+      '@node-rs/jieba-win32-x64-msvc': 2.0.1
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -16229,6 +16418,11 @@ snapshots:
   '@tsconfig/node14@1.0.3': {}
 
   '@tsconfig/node16@1.0.4': {}
+
+  '@tybys/wasm-util@0.10.0':
+    dependencies:
+      tslib: 2.6.3
+    optional: true
 
   '@tybys/wasm-util@0.9.0':
     dependencies:
