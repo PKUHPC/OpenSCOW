@@ -68,7 +68,7 @@
     "@next/bundle-analyzer": "14.2.4",
     "@types/google-protobuf": "3.15.12",
     "@types/mime-types": "2.1.4",
-    "@types/node": "20.14.8",
+    "@types/node": "22.17.2",
     "@types/nprogress": "0.2.3",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
