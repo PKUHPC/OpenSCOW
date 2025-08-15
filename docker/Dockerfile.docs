@@ -43,7 +43,7 @@ COPY protos ./protos
 
 RUN pnpm build
 
-FROM nginx:alpine@sha256:a5127daff3d6f4606be3100a252419bfa84fd6ee5cd74d0feaca1a5068f97dcf as runner
+FROM nginx:alpine@sha256:2459838ed006e699c252db374550c91490068bbf3b35fa8b9d29bfe0e31b8b95 as runner
 
 COPY docs/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder --chown=nginx:nginx /app/docs/build /etc/nginx/html/
