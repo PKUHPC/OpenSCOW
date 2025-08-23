@@ -19,26 +19,26 @@
     "lint": "eslint -c ../eslint.config.js ."
   },
   "dependencies": {
-    "@docusaurus/core": "3.4.0",
-    "@docusaurus/preset-classic": "3.4.0",
+    "@docusaurus/core": "3.8.1",
+    "@docusaurus/preset-classic": "3.8.1",
     "@mdx-js/react": "3.0.0",
     "clsx": "2.1.1",
     "prism-react-renderer": "2.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "@easyops-cn/docusaurus-search-local": "0.44.2",
-    "eslint": "9.6.0"
+    "@easyops-cn/docusaurus-search-local": "0.52.1",
+    "eslint": "9.34.0"
   },
   "devDependencies": {
-    "@adobe/jsonschema2md": "8.0.2",
-    "@docusaurus/module-type-aliases": "3.4.0",
+    "@adobe/jsonschema2md": "8.0.5",
+    "@docusaurus/module-type-aliases": "3.8.1",
     "@scow/config": "workspace:*",
-    "@sinclair/typebox": "0.32.34",
+    "@sinclair/typebox": "0.34.40",
     "@tsconfig/docusaurus": "2.0.3",
-    "@docusaurus/types": "3.4.0",
+    "@docusaurus/types": "3.8.1",
     "@types/react": "18.2.37",
-    "typescript": "5.5.2",
-    "@node-rs/jieba": "1.10.3",
+    "typescript": "5.9.2",
+    "@node-rs/jieba": "1.10.4",
     "unist-util-visit": "5.0.0"
   },
   "browserslist": {
