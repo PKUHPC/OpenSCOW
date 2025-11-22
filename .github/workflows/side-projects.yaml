@@ -25,7 +25,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Create version file for tag commit
         if: github.ref_type == 'tag'

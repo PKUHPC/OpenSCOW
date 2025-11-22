@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.repository.full_name == 'PKUHPC/OpenSCOW'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 2
           token: ${{ secrets.SCOW_DEPLOYMENT_PAT }}
