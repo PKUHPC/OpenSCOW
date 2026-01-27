@@ -49,7 +49,8 @@ export const ChangeEmailSchema = typeboxRouteSchema({
 });
 
 export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) => {
-  const auth = authenticate(() => true);
+  const { userId, newEmail } = req.body;
+  const auth = authenticate((info) => userId === info.identityId);
 
   const info = await auth(req, res);
 
@@ -59,8 +60,6 @@ export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) =>
   if (!ldapCapabilities.changeEmail) {
     return { 501: null };
   }
-
-  const { userId, newEmail } = req.body;
 
   const client = getClient(UserServiceClient);
 
