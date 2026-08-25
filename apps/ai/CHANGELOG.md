@@ -1,5 +1,14 @@
 # @scow/ai
 
+## 0.2.8
+
+### Patch Changes
+
+- 2e4194f: Fix: resolve CI build error in @scow/ai module
+- 6247e4f: 删除了文件管理下的前进和后退按钮
+- Updated dependencies [8de039b]
+  - @scow/ai-scheduler-adapter-protos@1.0.1
+
 ## 0.2.7
 
 ### Patch Changes
