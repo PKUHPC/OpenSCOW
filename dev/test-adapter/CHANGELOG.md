@@ -1,5 +1,12 @@
 # @scow/test-adapter
 
+## 1.1.7
+
+### Patch Changes
+
+- 2cef16e: 更新 node 版本
+- 8de039b: 修改 arm64 构建实际上非 arm64 镜像，并固定 AI 适配器接口 commit 以确保可以成功编译
+
 ## 1.1.6
 
 ### Patch Changes
