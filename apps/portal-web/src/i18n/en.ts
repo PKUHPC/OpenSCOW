@@ -268,6 +268,8 @@ export default {
           existModalOk: "Confirm",
           errorMessage: "{} error! A total of {} files/directories, {} succeeded, {} abandoned, {} failed",
           successMessage: "{} succeeded! A total of {} files/directories, {} succeeded, {} abandoned",
+          invalidCopyTitle: "Invalid Copy Operation",
+          invalidCopyContent: "Cannot copy a folder into itself or its subfolder: {}",
         },
         delete: {
           confirmTitle: "Confirm Deletion",

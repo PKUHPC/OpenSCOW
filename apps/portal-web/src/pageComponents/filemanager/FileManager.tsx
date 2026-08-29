@@ -209,6 +209,17 @@ export const FileManager: React.FC<Props> = ({ cluster, path, urlPrefix, scowdEn
     let abandonCount: number = 0;
     const allCount = operation.selected.length;
     for (const x of operation.selected) {
+      const fromPath = join(operation.originalPath, x.name);
+      const toPath = join(path, x.name);
+
+      // 阻止复制到自身或子目录
+      if (toPath === fromPath || toPath.startsWith(fromPath + "/")) {
+        modal.error({
+          title: t(p("moveCopy.invalidCopyTitle")),
+          content: t(p("moveCopy.invalidCopyContent"), [x.name]),
+        });
+        continue;
+      }
       try {
 
         const exists = await api.fileExist({ query: { cluster: cluster.id, path: join(path, x.name) } });
