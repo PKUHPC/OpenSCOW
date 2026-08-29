@@ -29,7 +29,6 @@ export const ChangeEmailSchema = typeboxRouteSchema({
   method: "PATCH",
 
   body: Type.Object({
-    userId:Type.String(),
     newEmail: Type.String(),
   }),
 
@@ -54,18 +53,18 @@ export default /* #__PURE__*/typeboxRoute(ChangeEmailSchema, async (req, res) =>
   const info = await auth(req, res);
 
   if (!info) { return; }
-
+  
   const ldapCapabilities = await getCapabilities(runtimeConfig.AUTH_INTERNAL_URL);
   if (!ldapCapabilities.changeEmail) {
     return { 501: null };
   }
-
-  const { userId, newEmail } = req.body;
-
+  
+  const { newEmail } = req.body;
+  
   const client = getClient(UserServiceClient);
 
   return await asyncClientCall(client, "changeEmail", {
-    userId,
+    userId:info.identityId,
     newEmail,
   })
     .then(() => ({ 204: null }))
