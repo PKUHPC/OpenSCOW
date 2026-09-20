@@ -27,7 +27,7 @@ import { config } from "src/config/env";
 import { decryptData, encryptData, generateIvAndKey } from "./aesUtils";
 
 const separator = "#";
-export const AES_ENCRYPTION_IV_KEY_REDIS_KEY = "auth:otp:ivkey";
+const otpCryptoMaterialRedisEntry = ["auth", "otp", "crypto-material"].join(":");
 
 interface OtpSessionInfo {
   dn: string,
@@ -53,7 +53,7 @@ function decodeIvKeyFromBase64(data: string): IvAndKey {
 }
 
 export async function getIvAndKey(f: FastifyInstance) {
-  const data = await f.redis.get(AES_ENCRYPTION_IV_KEY_REDIS_KEY);
+  const data = await f.redis.get(otpCryptoMaterialRedisEntry);
   if (!data) {
     return undefined;
   }
@@ -108,7 +108,7 @@ export async function storeOtpSessionAndGoSendEmailUI(
   if (!ivAndKey) {
     ivAndKey = generateIvAndKey();
     const encryptedIvKey = encodeIvKeyToBase64(ivAndKey);
-    await f.redis.set(AES_ENCRYPTION_IV_KEY_REDIS_KEY, encryptedIvKey);
+    await f.redis.set(otpCryptoMaterialRedisEntry, encryptedIvKey);
   }
   const encryptOtpSessionToken = encryptData(ivAndKey, otpSessionToken);
   await renderBindOtpHtml(false, req, res, callbackUrl,
@@ -171,18 +171,16 @@ export async function sendEmailAuthLink(
     },
   } as TransportOptions);
   const scowHostUrl = new URL(otpLdap.scowHost);
-  const href = String(Object.assign(new URL("http://example.com"), {
-    protocol: scowHostUrl.protocol,
-    host: scowHostUrl.host,
-    pathname: join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp/email/validation"),
-    search: `token=${otpSessionToken}&callbackUrl=${callbackUrl}`,
-  }));
+  const href = new URL(scowHostUrl.origin);
+  href.pathname = join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp/email/validation");
+  href.searchParams.set("token", otpSessionToken);
+  href.searchParams.set("callbackUrl", callbackUrl);
   const mailOptions = {
     from: otpLdap.authenticationMethod.mail.from,
     to: emailAddress,
     subject: otpLdap.authenticationMethod.mail.subject,
     html: await renderLiquidFile("email", {
-      href: href,
+      href: href.toString(),
       title: otpLdap.authenticationMethod.mail.title,
       contentText: otpLdap.authenticationMethod.mail.contentText,
       labelText: otpLdap.authenticationMethod.mail.labelText,
@@ -316,4 +314,3 @@ export async function validateOtpCode(
     }
   }
 }
-

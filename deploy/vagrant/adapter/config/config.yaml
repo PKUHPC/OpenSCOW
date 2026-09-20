@@ -4,7 +4,6 @@ mysql:
   port: 3306
   user: slurm
   dbname: slurm_acct_db
-  password: 123456
   clustername: hpc01
   databaseencode: utf8
 
@@ -19,4 +18,3 @@ slurm:
 # module profile文件路径
 modulepath:
   path: /gpfs/share/software/module/init/profile.sh
-

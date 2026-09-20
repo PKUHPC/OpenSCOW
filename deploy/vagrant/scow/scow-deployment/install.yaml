@@ -5,7 +5,6 @@ portal:
   basePath: /
   portMappings: {}
 mis:
-  dbPassword: must!chang3this
   portMappings: {}
 log:
   fluentd:
@@ -13,5 +12,4 @@ log:
 auth:
   portMappings: {}
 audit:
-  dbPassword: must!chang3this
   portMappings: {}

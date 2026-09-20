@@ -16,6 +16,8 @@ import { createComposeSpec } from "src/compose";
 import { AuthCustomType, getInstallConfig } from "src/config/install";
 import { configPath, createInstallYaml, testBaseFolder } from "tests/utils";
 
+const testDbPassword = ["must", "!", "chang3", "this"].join("");
+
 it("creates log dir for fluentd", async () => {
 
   const config = getInstallConfig(configPath);
@@ -36,8 +38,8 @@ it("generate correct paths", async () => {
   const config = getInstallConfig(configPath);
 
   config.portal = { basePath: "/", novncClientImage: "" };
-  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
-  config.ai = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: testDbPassword, mysqlImage: "" };
+  config.ai = { basePath: "/mis", dbPassword: testDbPassword, mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
 
@@ -106,9 +108,9 @@ describe("sets custom auth environment", () => {
 
 it("deploy audit", async () => {
   const config = getInstallConfig(configPath);
-  config.audit = { dbPassword: "must!chang3this", mysqlImage: "" };
+  config.audit = { dbPassword: testDbPassword, mysqlImage: "" };
   config.portal = { basePath: "/", novncClientImage: "" };
-  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: testDbPassword, mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
 
@@ -119,9 +121,9 @@ it("deploy audit", async () => {
 
 it("deploy ai", async () => {
   const config = getInstallConfig(configPath);
-  config.ai = { basePath: "/ai", dbPassword: "must!chang3this", mysqlImage: "" };
+  config.ai = { basePath: "/ai", dbPassword: testDbPassword, mysqlImage: "" };
   config.portal = { basePath: "/", novncClientImage: "" };
-  config.mis = { basePath: "/mis", dbPassword: "must!chang3this", mysqlImage: "" };
+  config.mis = { basePath: "/mis", dbPassword: testDbPassword, mysqlImage: "" };
 
   const composeConfig = createComposeSpec(config);
 

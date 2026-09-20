@@ -29,7 +29,7 @@ let testTransferDir: string = "";
 let testTransferFile: string = "";
 
 // 写入文件的内容
-const toCluster = "123.123.123.123";
+const toCluster = "target-cluster";
 const fatherPath = "/transfer_dir";
 const fileName = "transfer_file";
 const transferSize = "1,048,576";

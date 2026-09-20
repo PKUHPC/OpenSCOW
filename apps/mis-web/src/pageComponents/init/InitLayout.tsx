@@ -11,7 +11,6 @@
  */
 
 import { App, Button, Tabs, Typography } from "antd";
-import Link from "next/link";
 import Router, { useRouter } from "next/router";
 import React from "react";
 import { api } from "src/apis";
@@ -34,10 +33,10 @@ const CompleteButtonContainer = styled.div`
 `;
 
 const TabItems = [
-  { label: "pageComp.init.initLayout.importUser", href: "/init/importUsers" },
-  { label: "pageComp.init.initLayout.userManager", href: "/init/users" },
-  { label: "pageComp.init.initLayout.create", href: "/init/createInitAdmin" },
-  { label: "pageComp.init.initLayout.edit", href: "/init/jobPriceTable" },
+  "pageComp.init.initLayout.importUser",
+  "pageComp.init.initLayout.userManager",
+  "pageComp.init.initLayout.create",
+  "pageComp.init.initLayout.edit",
 ] as const;
 
 const TabsContainer = styled.div`
@@ -67,8 +66,8 @@ export const InitTab: React.FC = () => {
     <TabsContainer>
       <Tabs
         centered
-        items={TabItems.map(({ label, href }) => (
-          { key: href, label: <Link href={href}>{t(label)}</Link> }
+        items={TabItems.map((label) => (
+          { key: label, label: t(label) }
         ))}
         activeKey={router.asPath}
       />

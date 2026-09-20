@@ -16,7 +16,6 @@ services:
     ports:
       - 3890:80
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ldap://192.168.88.101
       PHPLDAPADMIN_HTTPS: false
 
   novnc-client:

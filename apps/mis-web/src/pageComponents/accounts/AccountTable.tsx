@@ -17,7 +17,6 @@ import { Money } from "@scow/protos/build/common/money";
 import { Static } from "@sinclair/typebox";
 import { App, Button, Divider, Form, Input, Popover, Space, Table, Tag, Tooltip } from "antd";
 import { SortOrder } from "antd/es/table/interface";
-import Link from "next/link";
 import React, { useMemo, useState } from "react";
 import { api } from "src/apis";
 import { FilterFormContainer, FilterFormTabs } from "src/components/FilterFormContainer";
@@ -347,9 +346,9 @@ export const AccountTable: React.FC<Props> = ({
               {/* 只在租户管理下的账户列表中显示管理成员和封锁阈值 */}
               {showedTab === "TENANT" && (
                 <>
-                  <Link href={{ pathname: `/tenant/accounts/${r.accountName}/users` }}>
+                  <span>
                     {t(p("mangerMember"))}
-                  </Link>
+                  </span>
                   <SetBlockThresholdAmountLink
                     accountName={r.accountName}
                     balance={r.balance}

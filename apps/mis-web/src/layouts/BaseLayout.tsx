@@ -10,11 +10,9 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { DesktopOutlined, RobotOutlined } from "@ant-design/icons";
 import { UiExtensionStore } from "@scow/lib-web/build/extensions/UiExtensionStore";
 import { BaseLayout as LibBaseLayout } from "@scow/lib-web/build/layouts/base/BaseLayout";
 import { HeaderNavbarLink } from "@scow/lib-web/build/layouts/base/header";
-import { join } from "path";
 import { PropsWithChildren, useMemo } from "react";
 import { useStore } from "simstate";
 import { LanguageSwitcher } from "src/components/LanguageSwitcher";
@@ -43,29 +41,7 @@ export const BaseLayout =
 
   const uiExtensionStore = useStore(UiExtensionStore);
 
-  const toCallbackPage = (url: string) => userStore.user
-    ? join(url,`/api/auth/callback?token=${userStore.user.token}`)
-    : url;
-
   const navbarLinks: HeaderNavbarLink[] = [];
-
-  if (publicConfig.PORTAL_URL) {
-    navbarLinks.push({
-      icon: <DesktopOutlined style={{ paddingRight: 2 }} />,
-      href: toCallbackPage(publicConfig.PORTAL_URL),
-      text: t("layouts.route.navLinkTextPortal"),
-      crossSystem: true,
-    });
-  }
-
-  if (publicConfig.AI_URL) {
-    navbarLinks.push({
-      icon: <RobotOutlined style={{ paddingRight: 2 }} />,
-      href: publicConfig.AI_URL,
-      text: t("layouts.route.navLinkTextAI"),
-      crossSystem: true,
-    });
-  }
 
   return (
     <LibBaseLayout

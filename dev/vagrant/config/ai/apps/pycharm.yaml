@@ -11,7 +11,6 @@ name: pycharm
 type: vnc
 image:
   # 镜像名称
-  name: 10.129.227.64/test/admin/pycharm
   # 镜像版本
   tag: v1.1
 

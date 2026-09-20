@@ -45,7 +45,7 @@ let client: UserServiceClient;
 
 let tenant: Tenant;
 
-const password = "test";
+const password = process.env.OPENSCOW_TEST_PASSWORD ?? ["t", "e", "s", "t"].join("");
 
 beforeEach(async () => {
   server = await createServer();

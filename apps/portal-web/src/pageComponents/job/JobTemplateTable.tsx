@@ -14,7 +14,6 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { JobTemplateInfo } from "@scow/protos/build/portal/job";
 import { App, Button, Form, Input, Modal, Popconfirm, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
-import Link from "next/link";
 import React, { useCallback, useState } from "react";
 import { useAsync } from "react-async";
 import { useStore } from "simstate";
@@ -187,19 +186,11 @@ const InfoTable: React.FC<InfoTableProps> = ({
       title: t("button.actionButton"),
       render:(_, r) => (
         <Space>
-          <Link
-            href={{
-              pathname: "/jobs/submit",
-              query: {
-                cluster: cluster.id,
-                jobTemplateId: r.id,
-              },
-            }}
-            onClick={r.jobName === "unknown" ? (e) => e.preventDefault() : undefined}
+          <span
             style={r.jobName === "unknown" ? { color: "grey", cursor: "not-allowed" } : {}}
           >
             {t(p("useTemplate"))}
-          </Link>
+          </span>
           <Popconfirm
             title={t(p("popConfirm"))}
             onConfirm={async () =>
@@ -258,5 +249,4 @@ const InfoTable: React.FC<InfoTableProps> = ({
     </>
   );
 };
-
 

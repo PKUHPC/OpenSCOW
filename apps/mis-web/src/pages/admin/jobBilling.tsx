@@ -69,8 +69,6 @@ export const AdminJobBillingTable: React.FC<{ tenant?: string }> = ({ tenant }) 
           <Form.Item label={t(p("managementObject"))}>
             <PlatformOrTenantRadio
               value={tenant || null}
-              onChange={(tenant) => Router.push({
-                pathname: "/admin/jobBilling", query:  tenant ? { tenant } : undefined })}
             />
           </Form.Item>
           <Form.Item>

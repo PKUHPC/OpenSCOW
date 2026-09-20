@@ -81,10 +81,6 @@ export const UsersPage: NextPage = requireAuth(
           reload={reload}
           accountName={accountName}
           canSetAdmin={account.role === UserRole.OWNER}
-          getJobsPageUrl={(userId) => ({
-            pathname: `/accounts/${accountName}/userJobs`,
-            query: { userId },
-          })}
         />
       </div>
     );

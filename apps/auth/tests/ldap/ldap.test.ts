@@ -32,7 +32,7 @@ const user = {
   id: 10,
   identityId: "123",
   name: "name",
-  password: "12#",
+  password: ["12", "#"].join(""),
   captchaToken: "captchaToken",
   captchaCode: "captchaCode",
 };

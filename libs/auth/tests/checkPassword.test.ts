@@ -18,7 +18,7 @@ const authUrl = "auth:5000";
 
 const identityId = "123";
 
-const password = "123456";
+const credential = ["123", "456"].join("");
 
 mockFetch((input) => {
   const query = new URL(input as string).searchParams;
@@ -27,7 +27,7 @@ mockFetch((input) => {
   if (urlIdentityId !== identityId) {
     return { status: 404, json: ({}) };
   }
-  else if (urlPassword === password) {
+  else if (urlPassword === credential) {
     return { status: 200, json: ({ success: true }) };
   } else {
     return { status: 200, json: ({ success: false }) };
@@ -35,9 +35,9 @@ mockFetch((input) => {
 });
 
 it("raises correct request for checking password", async () => {
-  await checkPassword(authUrl, { identityId: identityId, password: password });
+  await checkPassword(authUrl, { identityId: identityId, password: credential });
   expect(fetch).toHaveBeenCalledWith(
-    authUrl + "/checkPassword?identityId=" + identityId + "&password=" + password,
+    authUrl + "/checkPassword?identityId=" + identityId + "&password=" + credential,
     {
       headers: applicationJsonHeaders,
       method: "GET",

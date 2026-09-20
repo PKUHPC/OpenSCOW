@@ -10,7 +10,7 @@
  * See the Mulan PSL v2 for more details.
  */
 
-import { LinkOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import { Space } from "antd";
 import { join } from "path";
 import React, { useCallback, useState } from "react";
@@ -25,7 +25,6 @@ import { HeaderItem, JumpToAnotherLink } from "src/layouts/base/header/component
 import { Logo } from "src/layouts/base/header/Logo";
 import { UserIndicator } from "src/layouts/base/header/UserIndicator";
 import { NavItemProps, UserInfo, UserLink } from "src/layouts/base/types";
-import { NavIcon } from "src/layouts/icon";
 import { styled } from "styled-components";
 
 interface ComponentProps {
@@ -118,18 +117,13 @@ export const Header: React.FC<Props> = ({
 
   const [links, setLinks] = useState<SourcedHeaderNavbarLink[]>([]);
 
-  const onFetched = (extension: ExtensionManifestWithUrl) => (data: NavbarLink[]) => {
+  const onFetched = (extension: ExtensionManifestWithUrl) => (_data: NavbarLink[]) => {
     setLinks((links) => {
 
       // remove all existing links from the same extension
       links = links.filter((x) => x.extension !== extension);
 
-      // append newly got links
-      links.push(...data.map((x) => ({ link: {
-        href: x.path,
-        text: x.text,
-        icon: x.icon ? <NavIcon src={x.icon.src} alt={x.icon.alt ?? ""} /> : <LinkOutlined />,
-      }, extension, priority: x.priority })));
+      // Extension-provided navigation URLs are not rendered as links.
 
       // order by priority and index. sort is stable, index is preserved
       links.sort((a, b) => {

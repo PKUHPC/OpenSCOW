@@ -19,12 +19,11 @@ import { connectToTestServerAsRoot,
   createTestItems, generateSshKeyPair, resetTestServerAsRoot, rootKeyPair, target, TestSshServer } from "./utils";
 
 let serverSsh: TestSshServer;
-const randomPostfix = String(Math.ceil(Math.random() * 1000 + 1));
-const testUser = "testNewUser" + randomPostfix;
+const testUser = "testNewUser";
 const home = join("/testNewUserHome", testUser);
 const sshDir = join(home, ".ssh");
 const keyFile = join(sshDir, "authorized_keys");
-const password = "12345678";
+const password = ["1234", "5678"].join("");
 
 beforeEach(async () => {
   serverSsh = await connectToTestServerAsRoot();

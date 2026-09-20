@@ -15,7 +15,6 @@ import { DEFAULT_PAGE_SIZE } from "@scow/lib-web/build/utils/pagination";
 import { type AccountUserInfo } from "@scow/protos/build/server/user";
 import { Static } from "@sinclair/typebox";
 import { App, Divider, Popover, Space, Table, Tag } from "antd";
-import { LinkProps } from "next/link";
 import React from "react";
 import { api } from "src/apis";
 import { DisabledA } from "src/components/DisabledA";
@@ -31,7 +30,6 @@ interface Props {
   reload: () => void;
   accountName: string;
   canSetAdmin: boolean;
-  getJobsPageUrl: (userId: string) => LinkProps["href"];
 }
 
 const p = prefix("pageComp.user.userTable.");

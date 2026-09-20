@@ -1,7 +1,5 @@
 # 管理系统数据库的信息。可以不修改
 db:
-  host: 192.168.88.100
-  password: must!chang3this
   port: 3308
   user: root
   dbName: scow
@@ -45,8 +43,6 @@ createUser:
 
 # # 集群监控配置
 # clusterMonitor:
-#   # 协议 + ip/域名 + 端口，默认为 http://127.0.0.1:4000
-#   grafanaUrl: "http://172.16.20.125:4000"
 #   # 资源状态相关配置
 #   resourceStatus:
 #     # 是否开启资源状态，默认不开启
@@ -147,5 +143,3 @@ createUser:
 #       default: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
 #       en: "The billing for  jobId {{ idJob }} of Cluster {{ cluster }}"
 #       zh_cn: "集群 {{ cluster }} 的作业ID {{ idJob }} 的计费"
-
-

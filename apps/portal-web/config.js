@@ -195,8 +195,6 @@ const buildRuntimeConfig = async (phase, basePath) => {
   if (!building && !testenv) {
     console.log("Running @scow/portal-web");
     console.log("Version", readVersionFile());
-    console.log("Server Runtime Config", serverRuntimeConfig);
-    console.log("Public Runtime Config", publicRuntimeConfig);
 
     // HACK setup ws proxy
     setTimeout(() => {

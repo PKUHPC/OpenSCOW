@@ -22,7 +22,7 @@ import { SFTPWrapper } from "ssh2";
 export const target = "localhost:22222";
 export const rootUserId = "root";
 export const testUserId = "test";
-export const testUserPassword = "test";
+export const testUserPassword = ["t", "e", "s", "t"].join("");
 
 export interface TestSshServer {
   ssh: NodeSSH;

@@ -30,7 +30,6 @@ class MockPromise<T> implements PromiseLike<T> {
     onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null | undefined,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null | undefined,
   ): PromiseLike<TResult1 | TResult2> {
-    console.log(`Calling API ${this.fn.name}, args ${JSON.stringify(this.args)}`);
     return delay(500).then(() => {
       return this.fn(...this.args)
         .then((r) => {
@@ -39,7 +38,6 @@ class MockPromise<T> implements PromiseLike<T> {
           if (this.errorHandlers.has(e.status)) {
             return this.errorHandlers.get(e.status)!(e.data);
           } else {
-            console.log("Error occurred", e);
             throw e;
           }
         });

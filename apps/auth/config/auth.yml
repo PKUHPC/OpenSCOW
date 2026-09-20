@@ -43,7 +43,6 @@ otp:
           # SMTP身份验证用户名
           user: "morgan68@ethereal.email"
           # SMTP身份验证授权码
-          password: "y2es3bd3rYwxWs5n8g"
   # 如果mode指定为remote，需要配置以下内容
   remote:
     # 远程验证url，详见https://pkuhpc.github.io/OpenSCOW/docs/deploy/config/auth/config
@@ -57,7 +56,6 @@ captcha:
 ldap:
   url: ldap://localhost:389
   bindDN: cn=Manager,ou=hpc,o=pku
-  bindPassword: admin
   searchBase: ou=hpc,o=pku
   userFilter: (uid=*)
   addUser:

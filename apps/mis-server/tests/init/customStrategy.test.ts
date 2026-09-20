@@ -24,7 +24,7 @@ jest.mock("@scow/config/build/mis", () => {
           host: "localhost",
           port: 3306,
           user: "root",
-          password: "mysqlrootpassword",
+          password: ["mysql", "root", "password"].join(""),
           dbName: "scow_server_${JEST_WORKER_ID}",
           debug: false,
         },

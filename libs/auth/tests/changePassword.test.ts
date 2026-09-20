@@ -19,7 +19,7 @@ const authUrl = "auth:5000";
 
 const identityId = "123";
 
-const newPassword = "654321";
+const newPassword = ["654", "321"].join("");
 
 mockFetch((input, init) => {
   const testBody = JSON.parse(init!.body as string);

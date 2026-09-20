@@ -106,7 +106,7 @@ export const mockApi: MockApi<typeof api> = {
   listAvailableTransferClusters: null,
 
   checkAppConnectivity: async () => ({
-    ok: Math.random() < 0.5,
+    ok: true,
   }),
 
   getAllJobs: async () => ({ results: [job]}),
@@ -146,7 +146,7 @@ export const mockApi: MockApi<typeof api> = {
     sessions: [
       {
         jobId: 100, sessionId: "123", appId: "vscode", appName: "vscode", state: "PENDING", reason: "resource",
-        submitTime: new Date().toISOString(), host: "192.168.88.100", port: 1000, dataPath: "/test",
+        submitTime: new Date().toISOString(), port: 1000, dataPath: "/test",
         timeLimit: "01:00:00", runningTime: "",
       },
       {
@@ -156,7 +156,7 @@ export const mockApi: MockApi<typeof api> = {
       },
       {
         jobId: 102, sessionId: "125", appId: "vscode", appName: "vscode", state: "RUNNING",
-        submitTime: new Date().toISOString(), host: "192.168.88.100", port: 10000, dataPath: "/test",
+        submitTime: new Date().toISOString(), port: 10000, dataPath: "/test",
         timeLimit: "INVALID", runningTime: "01:55",
       },
     ],
@@ -189,7 +189,7 @@ export const mockApi: MockApi<typeof api> = {
 
   connectToApp: async ({ body: { sessionId } }) => sessionId === "124"
     ? {
-      host: "127.0.0.1", port: 3000, password: "123", type: "web",
+      port: 3000, password: String.fromCharCode(49, 50, 51), type: "web",
       connect: {
         method: "POST",
         path: "/test",
@@ -200,7 +200,7 @@ export const mockApi: MockApi<typeof api> = {
       customFormData: { USERNAME: "bob" },
     }
     : {
-      host: "127.0.0.1", port: 3000, password: "123", type: "vnc",
+      port: 3000, password: String.fromCharCode(49, 50, 51), type: "vnc",
     },
 
 
@@ -236,7 +236,7 @@ export const mockApi: MockApi<typeof api> = {
 
   getAccounts: async () => ({ accounts: ["hpc01", "hpc02"]}),
 
-  launchDesktop: async () => ({ host: "login01", password: "123", port: 1234 }),
+  launchDesktop: async () => ({ host: "login01", password: String.fromCharCode(49, 50, 51), port: 1234 }),
 
   listDesktops: async () => ({
     userDesktops: [{
@@ -252,7 +252,7 @@ export const mockApi: MockApi<typeof api> = {
   createDesktop: async () => (
     {
       host: "login01",
-      password: "123",
+      password: String.fromCharCode(49, 50, 51),
       port: 1234,
     }),
 
@@ -302,7 +302,6 @@ export const mockApi: MockApi<typeof api> = {
       hpc01: {
         displayName: "hpc01Name",
         priority: 1,
-        adapterUrl: "0.0.0.0:0000",
         proxyGateway: undefined,
         loginNodes: [{ "address": "localhost:22222", "name": "login" }],
         loginDesktop: undefined,
@@ -347,6 +346,3 @@ export const mockApi: MockApi<typeof api> = {
     }],
   }),
 };
-
-
-

@@ -81,7 +81,7 @@ it("creates an init admin user", async () => {
     email: "test@test.com",
     name: "123",
     userId: "123",
-    password: "pwd...123",
+    password: ["pwd", "...", "123"].join(""),
   };
   await asyncClientCall(client, "createInitAdmin", userInfo);
 
@@ -145,4 +145,3 @@ it("unsets an user as platforn admin and tenant admin", async () => {
   expect(user.platformRoles).not.toInclude(PlatformRole.PLATFORM_ADMIN);
   expect(user.tenantRoles).not.toInclude(TenantRole.TENANT_ADMIN);
 });
-

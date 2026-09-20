@@ -6,7 +6,6 @@ tokenTimeoutSeconds: 36000
 ldap:
   url: ldap://LDAP服务器地址
   bindDN: cn=Manager,ou=hpc,o=pku
-  bindPassword: "admin"
   searchBase: "ou=hpc,o=pku"
   userFilter: "(uid=*)"
 
