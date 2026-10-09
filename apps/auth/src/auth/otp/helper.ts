@@ -16,13 +16,11 @@ import ldapjs from "ldapjs";
 import { Liquid } from "liquidjs";
 import * as nodemailer from "nodemailer";
 import { TransportOptions } from "nodemailer";
-import { join } from "path";
 import * as speakeasy from "speakeasy";
 import { renderBindOtpHtml } from "src/auth/bindOtpHtml";
 import { extractAttr, searchOne, takeOne } from "src/auth/ldap/helpers";
 import { serveLoginHtml } from "src/auth/loginHtml";
 import { authConfig, LdapConfigSchema, OtpLdapSchema, OtpStatusOptions } from "src/config/auth";
-import { config } from "src/config/env";
 
 import { decryptData, encryptData, generateIvAndKey } from "./aesUtils";
 
@@ -170,20 +168,13 @@ export async function sendEmailAuthLink(
       pass: otpLdap.authenticationMethod.mail.mailTransportInfo.password,
     },
   } as TransportOptions);
-  const scowHostUrl = new URL(otpLdap.scowHost);
-  const href = new URL(scowHostUrl.origin);
-  href.pathname = join(config.BASE_PATH, config.AUTH_BASE_PATH, "/public/otp/email/validation");
-  href.searchParams.set("token", otpSessionToken);
-  href.searchParams.set("callbackUrl", callbackUrl);
   const mailOptions = {
     from: otpLdap.authenticationMethod.mail.from,
     to: emailAddress,
     subject: otpLdap.authenticationMethod.mail.subject,
     html: await renderLiquidFile("email", {
-      href: href.toString(),
       title: otpLdap.authenticationMethod.mail.title,
       contentText: otpLdap.authenticationMethod.mail.contentText,
-      labelText: otpLdap.authenticationMethod.mail.labelText,
     }),
   };
 

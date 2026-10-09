@@ -27,8 +27,6 @@ services:
 
   db:
     image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: mysqlrootpassword
     volumes:
       - "db:/var/lib/mysql"
     network_mode: service:scow-dev
