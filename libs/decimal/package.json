@@ -18,7 +18,7 @@
   "license": "Mulan PSL v2",
   "repository": "https://github.com/PKUHPC/OpenSCOW",
   "dependencies": {
-    "bignumber.js": "9.1.2"
+    "bignumber.js": "9.3.1"
   },
   "volta": {
     "extends": "../../package.json"
