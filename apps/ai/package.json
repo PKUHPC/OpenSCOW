@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "14.2.4",
-    "@testing-library/jest-dom": "6.4.6",
+    "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.0.0",
     "@types/busboy": "1.5.4",
     "@types/google-protobuf": "3.15.12",
